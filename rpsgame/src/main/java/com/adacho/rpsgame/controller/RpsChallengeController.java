@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/results")
 public class RpsChallengeController {
   private final RpsService rpsService;
+  // 주석
 
   @PostMapping
   Map<String, String> postResult(@RequestBody RequestDto dto) {
