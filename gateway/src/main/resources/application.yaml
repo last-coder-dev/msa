@@ -1,0 +1,51 @@
+server:
+  port: 8000
+  servlet:
+    session:
+      timeout: 60m
+
+spring:
+  application:
+    name: gateway
+  config:
+    import: "optional:consul:"
+  cloud:
+    consul:
+      enabled: true
+      discovery:
+        query-passing: true
+      config:
+        data-key: application.yml
+        prefixes: config
+        format: yaml
+        default-context: defaults
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: rpsgame
+              uri: lb://rpsgame/
+              predicates:
+                - Path=/results,/results/**
+            - id: leaderboard
+              uri: lb://leaderboard/
+              predicates:
+                - Path=/leaders,/stats
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "http://localhost:5173"
+                allowedHeaders:
+                  - "*"
+                allowedMethods:
+                  - "GET"
+                  - "POST"
+          default-filters:
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET, POST
+
+logging:
+  level:
+    "[org.springframework.cloud.gateway.handler.predicate]": trace
